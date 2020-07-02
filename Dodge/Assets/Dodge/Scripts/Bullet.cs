@@ -24,7 +24,7 @@ public class Bullet : MonoBehaviour
         m_DestoryCooltime -= Time.deltaTime;
 
         if (m_DestoryCooltime <= 0)
-            gameObject.SetActive(false);
+            Destroy(gameObject);
     }
 
     private void OnTriggerEnter(Collider other)

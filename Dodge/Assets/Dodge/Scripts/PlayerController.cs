@@ -19,10 +19,10 @@ public class PlayerController : MonoBehaviour
 
 
         //정답
-        float fireAxis = Input.GetAxis("Fire1");
+        //float fireAxis = Input.GetAxis("Fire1");
 
-        if (fireAxis > 0.95f)
-            Die();
+        //if (fireAxis > 0.95f)
+        //    Die();
     }
 
     public void Die()
