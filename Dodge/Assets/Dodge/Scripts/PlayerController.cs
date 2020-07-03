@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public GameManager m_GameManager;
+
     public float m_Speed = 25f;
     // Update is called once per frame
     void Update()
@@ -28,6 +30,6 @@ public class PlayerController : MonoBehaviour
     public void Die()
     {
         Debug.Log("사망");
-        gameObject.SetActive(false);
+        m_GameManager.GameOver();
     }
 }
