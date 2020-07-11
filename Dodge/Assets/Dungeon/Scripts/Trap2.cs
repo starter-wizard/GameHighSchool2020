@@ -1,18 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Trap2 : MonoBehaviour
 {
+    public UnityEvent m_OnEnter;
 
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log("트리거 안에 어떤 Collider나 Trigger가 들어갔을 때");
         if(other.attachedRigidbody != null)
         {
-            var player = other.attachedRigidbody.GetComponent<PlayerController_Dungeon2>();
+            var player = other.attachedRigidbody
+                .GetComponent<PlayerController_Dungeon2>();
             if (player != null)
-                player.Die();
+                m_OnEnter.Invoke();
         }
     }
 
