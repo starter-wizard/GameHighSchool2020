@@ -384,8 +384,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Animator: {fileID: 309126431}
+  m_Rigidbody2D: {fileID: 309126434}
   m_IsGround: 0
   m_IsDead: 0
+  m_JumpCount: 0
 --- !u!1 &924207639
 GameObject:
   m_ObjectHideFlags: 0
