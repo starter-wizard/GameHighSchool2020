@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Ground
+  - DeadZone
   layers:
   - Default
   - TransparentFX
@@ -40,4 +42,13 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Back
+    uniqueID: 596681973
+    locked: 0
+  - name: Middle
+    uniqueID: 2446226053
+    locked: 0
+  - name: Forward
+    uniqueID: 2343593617
     locked: 0
