@@ -1,11 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     public Animator m_Animator;
     public Rigidbody2D m_Rigidbody2D;
+    public AudioSource m_AudioSource;
+
+    public AudioClip m_Jump;
+    public AudioClip m_Die;
 
     public bool m_IsGround = false;
     public bool m_IsDead = false;
@@ -14,6 +19,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (m_IsDead) return;
+
         m_Animator.SetBool("IsGround", m_IsGround);
 
         if (Input.GetKeyDown(KeyCode.Space) 
@@ -23,6 +30,9 @@ public class PlayerController : MonoBehaviour
                 = Vector2.zero;
             m_Rigidbody2D.AddForce(Vector2.up * 400);
             m_JumpCount++;
+
+            m_AudioSource.clip = m_Jump;
+            m_AudioSource.Play();
         }
     }
 
@@ -43,4 +53,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "DeadZone")
+        {
+            m_IsDead = true;
+            m_Animator.SetBool("IsDead", m_IsDead);
+
+            GameManager.Instance.OnPlayerDead();
+
+            m_AudioSource.clip = m_Die;
+            m_AudioSource.Play();
+        }
+    }
 }
