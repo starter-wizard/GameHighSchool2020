@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -29,10 +30,30 @@ public class GameManager : MonoBehaviour
     public void OnPlayerDead(){
         m_IsGameOver = true;
         m_GameOverUI.SetActive(true);
+
+        ScrollingObject[] scrollingObjects = FindObjectsOfType<ScrollingObject>();
+        foreach (var scrollingObject in scrollingObjects)
+            scrollingObject.enabled = false;
+
+        FindObjectOfType<PlatformSpawner>().enabled = false;
     }
     public void OnAddScore(){
         m_Score++;
         m_ScoreUI.text 
             = string.Format("SCORE : {0}", m_Score);
+    }
+
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            Restart();
+        }
+    }
+
+    public void Restart()
+    {
+        if (m_IsGameOver)
+            SceneManager.LoadScene("Level_UniRun");
     }
 }

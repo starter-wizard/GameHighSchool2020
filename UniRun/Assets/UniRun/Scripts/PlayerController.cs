@@ -23,8 +23,13 @@ public class PlayerController : MonoBehaviour
 
         m_Animator.SetBool("IsGround", m_IsGround);
 
-        if (Input.GetKeyDown(KeyCode.Space) 
-            && m_JumpCount<2)
+        if (Input.GetKeyDown(KeyCode.Space))
+            Jump();
+    }
+
+    public void Jump()
+    {
+        if (m_JumpCount < 2)
         {
             m_Rigidbody2D.velocity
                 = Vector2.zero;
