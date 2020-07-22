@@ -13,8 +13,11 @@ public class Player : MonoBehaviour
 
     public Transform[] m_FireMuzzles;
 
+    public bool isDead = false;
     private void Update()
     {
+        if (isDead) return;
+
         float xAxis = Input.GetAxis("Horizontal");
         float yAxis = Input.GetAxis("Vertical");
         Vector2 inputValue = new Vector2(xAxis, yAxis).normalized;
@@ -34,5 +37,20 @@ public class Player : MonoBehaviour
             m_AttackCooldown = m_AttackDelay;
         }
         m_AttackCooldown -= Time.deltaTime;
+    }
+
+    public Animator m_Animator;
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "EnemyBullet")
+        {
+            m_Animator.SetBool("Die", true);
+            isDead = true;
+        }
+    }
+
+    public void Die()
+    {
+        Destroy(gameObject);
     }
 }
