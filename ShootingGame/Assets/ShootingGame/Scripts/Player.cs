@@ -51,6 +51,7 @@ public class Player : MonoBehaviour
 
     public void Die()
     {
+        GameManager.instance.OnPlayerDie();
         Destroy(gameObject);
     }
 }
