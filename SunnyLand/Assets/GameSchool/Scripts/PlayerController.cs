@@ -43,11 +43,17 @@ public class PlayerController : MonoBehaviour
         m_Animator = GetComponent<Animator>();
     }
 
+    //추가
+    public VariableJoystick m_Joystick;
     protected void Update()
     {
         //Device Input 받아오기
         float xAxis = Input.GetAxis("Horizontal");
         float yAxis = Input.GetAxis("Vertical");
+
+        //추가
+        xAxis += m_Joystick.Horizontal;
+        yAxis += m_Joystick.Vertical;
 
         //+= => -=    <=  =>  >
         m_HitRecoveringTime -= Time.deltaTime;
@@ -55,13 +61,11 @@ public class PlayerController : MonoBehaviour
         {
             ClimbingExit();
 
-            //수정
             m_Animator.SetBool("TakingDamage", true);
             return;
         }
         else
         {
-            //수정
             m_Animator.SetBool("TakingDamage", false);
         }
 

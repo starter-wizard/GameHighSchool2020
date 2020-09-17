@@ -23,8 +23,14 @@ public class FlyPatrol : MonoBehaviour
         m_PatrolPos = transform.position + m_PatrolOffset;
     }
 
-    void Update()
+    //아래 추가
+    public void ResetPatrolPos()
     {
+        m_PatrolPos = transform.position + m_PatrolOffset;
+    }
+
+    void Update()
+    { 
         m_PatrolTime += Time.deltaTime;
 
         var lap = m_PatrolTime / m_PatrolTerm;

@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 3742212291512729452}
   - component: {fileID: 3742212291512729455}
   - component: {fileID: 3742212291512729454}
+  - component: {fileID: 3325876889033789706}
   m_Layer: 0
   m_Name: Sunny
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -75,13 +76,14 @@ MonoBehaviour:
   m_SideCollider: {fileID: 0}
   m_XAxisSpeed: 5
   m_YJumpPower: 500
-  m_ClimbSpeed: 2
+  m_ClimbSpeed: 2.05
   m_MoveState: 0
   m_JumpCount: 0
   m_IsTouchLadder: 0
   m_IsClimbing: 0
   m_IsJumping: 0
   m_FlightTime: 0
+  m_HitRecoveringTime: 0
 --- !u!95 &3742212291512729455
 Animator:
   serializedVersion: 3
@@ -113,9 +115,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67fd238f100ab014ab1de0925546fc9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_HP: 30
   m_OnTakeDamage:
     m_PersistentCalls:
       m_Calls: []
+  m_OnDie:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3325876889033789706}
+        m_MethodName: SpawnEffect
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 3742212291512729454}
+        m_MethodName: DestroySelf
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &3325876889033789706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3742212291512729443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8eaf0de87a10f4448d3df56601193d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectPrefab: {fileID: 4754545107796872518, guid: cb79b45d945283d4f9174d4c76b7e0e3,
+    type: 3}
 --- !u!1 &3742212292570116208
 GameObject:
   m_ObjectHideFlags: 0
