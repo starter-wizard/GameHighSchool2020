@@ -34,16 +34,15 @@ public class PlayerController : MonoBehaviour
 
     public float m_FlightTime = 0f;
 
-    //추가
     public float m_HitRecoveringTime = 0;
 
-    protected void Start()
+    //추가
+    private bool m_InputJump = false;
+    public void Jump()
     {
-        m_Rigidbody2D = GetComponent<Rigidbody2D>();
-        m_Animator = GetComponent<Animator>();
+        m_InputJump = true;
     }
 
-    //추가
     public VariableJoystick m_Joystick;
     protected void Update()
     {
@@ -51,9 +50,12 @@ public class PlayerController : MonoBehaviour
         float xAxis = Input.GetAxis("Horizontal");
         float yAxis = Input.GetAxis("Vertical");
 
-        //추가
         xAxis += m_Joystick.Horizontal;
         yAxis += m_Joystick.Vertical;
+
+        //추가
+        var inputJump = m_InputJump;
+        m_InputJump = false;
 
         //+= => -=    <=  =>  >
         m_HitRecoveringTime -= Time.deltaTime;
@@ -89,7 +91,8 @@ public class PlayerController : MonoBehaviour
                 m_Sprite.localScale = new Vector3(-1, 1, 1);
 
             //점프 처리
-            if (Input.GetKeyDown(KeyCode.Space)
+            if ((Input.GetKeyDown(KeyCode.Space)
+                || inputJump)
                 && m_JumpCount <= 0)
             {
                 m_Rigidbody2D.AddForce(Vector2.up * m_YJumpPower); ;
@@ -119,7 +122,8 @@ public class PlayerController : MonoBehaviour
 
             transform.position += movement;
 
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space) 
+                || inputJump)
             {
                 ClimbingExit();
             }
@@ -131,6 +135,13 @@ public class PlayerController : MonoBehaviour
                 Mathf.Abs(xAxis) + Mathf.Abs(yAxis));
         }
     }
+
+    protected void Start()
+    {
+        m_Rigidbody2D = GetComponent<Rigidbody2D>();
+        m_Animator = GetComponent<Animator>();
+    }
+
 
     private void ClimbingExit()
     {
@@ -214,7 +225,7 @@ public class PlayerController : MonoBehaviour
 
             ClimbingExit();
         }
+
     }
 
-    //40분까지 먼저한 사람은 조용히 복습
 }

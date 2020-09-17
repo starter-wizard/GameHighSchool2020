@@ -20,8 +20,10 @@ public class GameManager : MonoBehaviour
     public GameObject m_GameOverUI;
 
 
-    //추가
     public VariableJoystick m_Joystick;
+
+    //추가
+    public UnityEngine.UI.Button m_JumpButton;
 
     public void GameStart()
     {
@@ -33,10 +35,13 @@ public class GameManager : MonoBehaviour
 
         m_JointArm.m_Target = playerInstance.transform;
 
-        //추가
         var playerController = playerInstance
             .GetComponent<PlayerController>();
         playerController.m_Joystick = m_Joystick;
+
+        //추가
+        m_JumpButton.onClick.AddListener(
+            playerController.Jump);
     }
 
     public void GameOver()
