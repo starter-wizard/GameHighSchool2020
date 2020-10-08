@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    //상태 머신에 대해서
+    //
+
     public Rigidbody2D m_Rigidbody2D;
     public float m_MovementSpeed = 5f;
     public float m_JumpSpeed = 10f;
