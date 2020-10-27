@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
         Walking,
         Jumping,
         Crouching,
+        Hurt,
     }
 
     public State m_State = State.None;
@@ -20,6 +21,8 @@ public class PlayerController : MonoBehaviour
     public Animator m_Animator;
     public Collider2D m_MovementCollider;
     public Collider2D m_SideBlockCollider;
+    public Collider2D m_HitBox;
+    public Collider2D m_AttackBox;
     #endregion //참조
 
     #region 상태값
@@ -27,10 +30,9 @@ public class PlayerController : MonoBehaviour
     public float m_JumpSpeed = 10f;
 
     public bool m_IsGround;
-    public int m_AttachedGroundCount = 0;
-    public List<GameObject> m_AttachedGround = new List<GameObject>();
 
     public float m_CrouchTimer = 0;
+    public float m_HurtTimer = 0;
     #endregion //상태값
 
     #region 입력값
@@ -38,6 +40,13 @@ public class PlayerController : MonoBehaviour
     public float m_yAxis;
     #endregion //입력값
 
+    public void SetAttackBox(bool enable)
+    {
+        if (enable)
+            m_AttackBox.enabled = true;
+        else
+            m_AttackBox.enabled = false;
+    }
 
     public void EnterState(State state)
     {
@@ -63,6 +72,7 @@ public class PlayerController : MonoBehaviour
             case State.Jumping:
                 {
                     m_Animator.SetTrigger("Jumpping");
+                    SetAttackBox(true);
                 }
                 break;
             case State.Crouching:
@@ -71,12 +81,26 @@ public class PlayerController : MonoBehaviour
                     m_CrouchTimer = 0f;
                 }
                 break;
+            case State.Hurt:
+                m_Rigidbody2D.velocity = Vector3.up * 10f;
+                m_Animator.SetTrigger("Hurt");
+                StartCoroutine(Immune());
+                break;
             default:
                 break;
         }
     }
 
+    IEnumerator Immune()
+    {
+        m_HitBox.enabled = false;
+        yield return new WaitForSeconds(0.6f);
 
+        ChangeState(State.Idle);
+
+        yield return new WaitForSeconds(1.5f);
+        m_HitBox.enabled = true;
+    }
     public void ExitState(State state)
     {
         switch (state)
@@ -91,10 +115,13 @@ public class PlayerController : MonoBehaviour
             case State.Walking:
                 break;
             case State.Jumping:
+                SetAttackBox(false);
                 break;
             case State.Crouching:
                 m_MovementCollider.enabled = true;
                 m_SideBlockCollider.enabled = true;
+                break;
+            case State.Hurt:
                 break;
             default:
                 break;
@@ -132,9 +159,18 @@ public class PlayerController : MonoBehaviour
                     m_yAxis = Input.GetAxis("Vertical");
                 }
                 break;
+            case State.Hurt:
+                m_xAxis = 0;
+                m_yAxis = 0;
+                break;
             default:
                 break;
         }
+    }
+
+    public void Hurt()
+    {
+        ChangeState(State.Hurt);
     }
 
     public void FixedUpdateProcess(State state)
@@ -145,7 +181,7 @@ public class PlayerController : MonoBehaviour
                 break;
             case State.Idle:
                 {
-                    if(Mathf.Abs(m_xAxis) <= 0.1f)
+                    if (Mathf.Abs(m_xAxis) <= 0.1f)
                     {
                         Vector2 velocity = m_Rigidbody2D.velocity;
                         velocity.x = 0;
@@ -156,7 +192,7 @@ public class PlayerController : MonoBehaviour
                         ChangeState(State.Walking);
                     }
                     //위쪽 입력이 들어오고, 땅을 밝고 있을 때
-                    if(m_yAxis >= 0.1f && m_AttachedGround.Count >= 1)
+                    if (m_IsGround && m_yAxis >= 0.1f)
                     {
                         //플레이어는 위쪽으로 점프한다.
                         Vector2 velocity = m_Rigidbody2D.velocity;
@@ -164,8 +200,8 @@ public class PlayerController : MonoBehaviour
                         m_Rigidbody2D.velocity = velocity;
                         ChangeState(State.Jumping);
                     }
-                    
-                    if(m_yAxis <= -0.2f)
+
+                    if (m_IsGround && m_yAxis <= -0.2f)
                     {
                         ChangeState(State.Crouching);
                     }
@@ -185,7 +221,7 @@ public class PlayerController : MonoBehaviour
                     }
 
 
-                    if (m_yAxis >= 0.1f && m_AttachedGround.Count >= 1)
+                    if (m_IsGround && m_yAxis >= 0.1f)
                     {
                         Vector2 velocity = m_Rigidbody2D.velocity;
                         velocity.y = m_JumpSpeed;
@@ -203,9 +239,7 @@ public class PlayerController : MonoBehaviour
                         m_Rigidbody2D.velocity = velocity;
                     }
 
-                    //땅에 닫고 있고,
-                    //떨어지고 있을 경우에
-                    if (m_AttachedGroundCount >= 1 && m_Rigidbody2D.velocity.y <= 0)
+                    if (m_IsGround)
                     {
                         if (Mathf.Abs(m_xAxis) <= 0.1f)
                             ChangeState(State.Idle);
@@ -216,7 +250,7 @@ public class PlayerController : MonoBehaviour
                 break;
             case State.Crouching:
                 {
-                    if(m_yAxis >= 0)
+                    if (m_yAxis >= 0)
                     {
                         ChangeState(State.Idle);
                     }
@@ -230,12 +264,14 @@ public class PlayerController : MonoBehaviour
 
                         m_CrouchTimer = 100f;
                     }
-                    else if(m_CrouchTimer >= 100.3f)
+                    else if (m_CrouchTimer >= 100.3f)
                     {
                         m_MovementCollider.enabled = true;
                         m_SideBlockCollider.enabled = true;
                     }
                 }
+                break;
+            case State.Hurt:
                 break;
             default:
                 break;
@@ -259,7 +295,7 @@ public class PlayerController : MonoBehaviour
                     //스프라이트 플립
                     if (m_xAxis > 0)
                         m_Renderer.flipX = false;
-                    else if(m_xAxis < 0)
+                    else if (m_xAxis < 0)
                         m_Renderer.flipX = true;
                 }
                 break;
@@ -271,6 +307,8 @@ public class PlayerController : MonoBehaviour
                     else if (m_xAxis < 0)
                         m_Renderer.flipX = true;
                 }
+                break;
+            case State.Hurt:
                 break;
             default:
                 break;
@@ -306,126 +344,13 @@ public class PlayerController : MonoBehaviour
         IntputHandlerProcess(m_State);
 
         UpdateProcess(m_State);
-
-        //디버깅용
-        m_AttachedGroundCount = m_AttachedGround.Count;
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.collider.tag == "Ground")
-        {
-            //부닥친 모든 부분 중
-            foreach (var contact in collision.contacts)
-            {
-                //밟은 부분이 아래라면
-                if (contact.normal.y >= 0.5f)
-                {
-                    //밟고 있는 땅에 대한 중복처리
-                    if (!m_AttachedGround.Contains(collision.collider.gameObject))
-                        m_AttachedGround.Add(collision.collider.gameObject);
-
-                    break;
-                }
-            }
-        }
-    }
-
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        if (collision.collider.tag == "Ground")
-        {
-            if (m_AttachedGround.Contains(collision.collider.gameObject))
-                m_AttachedGround.Remove(collision.collider.gameObject);
-
-            //부닥친 모든 부분 중
-            foreach (var contact in collision.contacts)
-            {
-                //밟은 부분이 아래라면
-                if (contact.normal.y >= 0.5f)
-                {
-                    //밟고 있는 땅에 대한 중복처리
-                    if (!m_AttachedGround.Contains(collision.collider.gameObject))
-                        m_AttachedGround.Add(collision.collider.gameObject);
-
-                    break;
-                }
-            }
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.collider.tag == "Ground")
-        {
-            //밟고 있는 땅에 대한 중복처리
-            if (m_AttachedGround.Contains(collision.collider.gameObject))
-                m_AttachedGround.Remove(collision.collider.gameObject);
-        }
     }
 
     #endregion //유니티 생명주기
 
-
-
-    //public int m_ContactGround;
-
-    //private void OnCollisionStay2D(Collision2D collision)
-    //{
-    //    foreach (var contact in collision.contacts)
-    //    {
-    //        if(contact.collider.tag == "Ground"
-    //            && contact.normal.y > 0.8f)
-    //        {
-    //            m_IsGround = true;
-    //        }
-    //    }
-    //}
-
-    //private void OnCollisionExit2D(Collision2D collision)
-    //{
-    //    foreach (var contact in collision.contacts)
-    //    {
-    //        if (contact.collider.tag == "Ground"
-    //            && contact.normal.y > 0.8f)
-    //        {
-    //            m_IsGround = false;
-    //        }
-    //    }
-    //}
-
-    //private void FixedUpdate()
-    //{
-    //    var xAxis = Input.GetAxis("Horizontal");
-    //    var yAxis = Input.GetAxis("Vertical");
-
-    //    Vector2 velocity = m_Rigidbody2D.velocity;
-    //    velocity.x = xAxis * m_MovementSpeed;
-
-    //    if (yAxis > 0.1f)
-    //    {
-    //        velocity.y = m_JumpSpeed;
-    //    }
-    //    m_Rigidbody2D.velocity = velocity;
-    //}
-
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    foreach(var contact in collision.contacts)
-    //    {
-    //        //머리로 무언가에 부닥쳤을 때
-    //        if (contact.normal.y > -0.8f)
-    //        {
-    //            Vector2 velocity = m_Rigidbody2D.velocity;
-
-    //            //점프 중이면
-    //            if (velocity.y > 0)
-    //                velocity.y = 0;
-
-    //            m_Rigidbody2D.velocity = velocity;
-    //        }
-    //    }
-    //}
-
+    public void SetIsGround(bool isGround)
+    {
+        m_IsGround = isGround;
+    }
 
 }
