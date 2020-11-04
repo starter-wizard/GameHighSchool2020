@@ -21,26 +21,28 @@ public class PlayerMovement : MonoBehaviour {
     private void FixedUpdate() {
         // 물리 갱신 주기마다 움직임, 회전, 애니메이션 처리 실행
 
-        //앞뒤 움직임
-        transform.position 
-            += transform.forward 
-               * moveSpeed * Time.fixedDeltaTime 
-               * playerInput.move;
-        //조우 회전
-        transform.Rotate(0, 
-            rotateSpeed * Time.fixedDeltaTime * playerInput.rotate, 
-            0);
+        Move();
+
+        Rotate();
 
         playerAnimator.SetFloat("Move", playerInput.move);
     }
 
     // 입력값에 따라 캐릭터를 앞뒤로 움직임
     private void Move() {
-        
+
+        //앞뒤 움직임
+        transform.position
+            += transform.forward
+               * moveSpeed * Time.fixedDeltaTime
+               * playerInput.move;
     }
 
     // 입력값에 따라 캐릭터를 좌우로 회전
     private void Rotate() {
-
+        //좌 회전
+        transform.Rotate(0,
+            rotateSpeed * Time.fixedDeltaTime * playerInput.rotate,
+            0);
     }
 }
