@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 // 총을 구현한다
@@ -38,6 +39,8 @@ public class Gun : MonoBehaviour {
 
     private void Awake() {
         // 사용할 컴포넌트들의 참조를 가져오기
+        bulletLineRenderer = GetComponent<LineRenderer>();
+        gunAudioPlayer = GetComponent<AudioSource>();
     }
 
     private void OnEnable() {
@@ -46,21 +49,63 @@ public class Gun : MonoBehaviour {
 
     // 발사 시도
     public void Fire() {
+        //마지막으로 총을 쏜시간 + 공격 딜레이 보다 현재 시간이 더 오래되었으면
+        if(lastFireTime + timeBetFire <= Time.time)
+        {
+            Shot();
 
+            //마지막으로 총을 쏜 시간은 현재.
+            lastFireTime = Time.time;
+        }
     }
 
     // 실제 발사 처리
-    private void Shot() {
-        
+    private void Shot() 
+    {
+        RaycastHit hitInfo;
+        bool isHit = Physics.Raycast(fireTransform.position,
+            fireTransform.forward, 
+            out hitInfo,
+            fireDistance);
+
+        Vector3 hitPosition;
+        if (isHit)
+        {
+            hitPosition = hitInfo.point;
+        }
+        else
+        {
+            hitPosition = fireTransform.position 
+                + fireTransform.forward * fireDistance;
+        }
+
+        StartCoroutine(ShotEffect(hitPosition));
     }
 
     // 발사 이펙트와 소리를 재생하고 총알 궤적을 그린다
-    private IEnumerator ShotEffect(Vector3 hitPosition) {
+    private IEnumerator ShotEffect(Vector3 hitPosition) 
+    {
+        //총구에서 화염과 슈팅 소리가 난다.
+        muzzleFlashEffect.Play();
+        gunAudioPlayer.clip = shotClip;
+        gunAudioPlayer.Play();
+
+        //총알 궤적에 대한 이펙트가 정 위치에 보입니다.
+        List<Vector3> linePoint = new List<Vector3>();
+        linePoint.Add(fireTransform.position);
+        linePoint.Add(hitPosition);
+
+        bulletLineRenderer.SetPositions(linePoint.ToArray());
+
+
         // 라인 렌더러를 활성화하여 총알 궤적을 그린다
         bulletLineRenderer.enabled = true;
 
         // 0.03초 동안 잠시 처리를 대기
         yield return new WaitForSeconds(0.03f);
+
+        //탄피가 배출된다.
+        shellEjectEffect.Play();
 
         // 라인 렌더러를 비활성화하여 총알 궤적을 지운다
         bulletLineRenderer.enabled = false;
