@@ -45,6 +45,8 @@ public class Gun : MonoBehaviour {
 
     private void OnEnable() {
         // 총 상태 초기화
+        //(수정...)탄창 크기에 맞춰 탄창에 총알을 가득채운다.
+        magAmmo = magCapacity;  
     }
 
     // 발사 시도
@@ -52,10 +54,17 @@ public class Gun : MonoBehaviour {
         //마지막으로 총을 쏜시간 + 공격 딜레이 보다 현재 시간이 더 오래되었으면
         if(lastFireTime + timeBetFire <= Time.time)
         {
-            Shot();
+            //(정담...) 탄창에 총알이 있다면
+            if(magAmmo > 0)
+            {
+                Shot();
 
-            //마지막으로 총을 쏜 시간은 현재.
-            lastFireTime = Time.time;
+                //(수정...)총알을 쏠때마다 탄창의 총알은 1씩 소모
+                magAmmo -= 1;
+
+                //마지막으로 총을 쏜 시간은 현재.
+                lastFireTime = Time.time;
+            }
         }
     }
 
@@ -112,8 +121,22 @@ public class Gun : MonoBehaviour {
     }
 
     // 재장전 시도
-    public bool Reload() {
-        return false;
+    public bool Reload() 
+    {
+        //탄창에 총알이 전부 채워져 있다면, false 리턴
+        if (magAmmo >= magCapacity)
+        {
+            return false;
+        }
+        //탄창에 총알이 전부 채워져 있지 않다면,
+        else
+        {
+            //탄창에 총알을 채워넣는다.
+            //그리고 true 리턴
+
+            magAmmo = magCapacity;
+            return true;
+        }
     }
 
     // 실제 재장전 처리를 진행
