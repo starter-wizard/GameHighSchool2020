@@ -32,9 +32,13 @@ public class PlayerShooter : MonoBehaviour {
         if (playerInput.fire)
             gun.Fire();
 
-        //(수정...)
         if (playerInput.reload)
-            gun.Reload();
+        {
+            if (gun.Reload())
+            {
+                playerAnimator.SetTrigger("Reload");
+            }
+        }
     }
 
     // 탄약 UI 갱신

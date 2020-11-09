@@ -81,6 +81,18 @@ public class Gun : MonoBehaviour {
         if (isHit)
         {
             hitPosition = hitInfo.point;
+
+            //수정(아래)
+            IDamageable[] damageables;
+            if (hitInfo.rigidbody != null)
+                damageables = hitInfo.rigidbody.GetComponents<IDamageable>();
+            else
+                damageables = hitInfo.collider.GetComponents<IDamageable>();
+
+            foreach (var damageable in damageables)
+            {
+                damageable.OnDamage(damage, hitPosition, hitInfo.normal);
+            }
         }
         else
         {
@@ -123,18 +135,29 @@ public class Gun : MonoBehaviour {
     // 재장전 시도
     public bool Reload() 
     {
-        //탄창에 총알이 전부 채워져 있다면, false 리턴
         if (magAmmo >= magCapacity)
         {
             return false;
         }
-        //탄창에 총알이 전부 채워져 있지 않다면,
+        else if (ammoRemain <= 0)
+        {
+            return false;
+        }
         else
         {
-            //탄창에 총알을 채워넣는다.
-            //그리고 true 리턴
+            int requiredAmmo = magCapacity - magAmmo;
 
-            magAmmo = magCapacity;
+            if (ammoRemain >= requiredAmmo)
+            {
+                magAmmo = magCapacity;
+                ammoRemain -= requiredAmmo;
+            }
+            else
+            {
+                magAmmo = ammoRemain;
+                ammoRemain = 0;
+            }
+
             return true;
         }
     }
