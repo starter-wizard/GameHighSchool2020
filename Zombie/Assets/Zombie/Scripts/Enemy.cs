@@ -120,6 +120,9 @@ public class Enemy : LivingEntity {
         //충돌체 제거시 중력에 의해 떨어지는 현상을 제거함.
         GetComponent<Rigidbody>().isKinematic = true;
         GetComponent<Collider>().enabled = false;
+
+        /*추가*/ GameManager.instance.AddScore(100);
+        FindObjectOfType<EnemySpawner>().RemoveEnemy(this);
     }
 
     private void OnTriggerStay(Collider other) 

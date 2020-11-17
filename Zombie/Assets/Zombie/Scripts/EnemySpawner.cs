@@ -46,7 +46,10 @@ public class EnemySpawner : MonoBehaviour {
 
     // 현재 웨이브에 맞춰 적을 생성
     private void SpawnWave() {
-        CreateEnemy(0);
+        wave++;
+
+        for(int i=0; i<wave; i++)
+            CreateEnemy(0);
     }
 
     // 적을 생성하고 생성한 적에게 추적할 대상을 할당
@@ -81,5 +84,10 @@ public class EnemySpawner : MonoBehaviour {
 
         enemies.Add(enemy);
 
+    }
+
+    public void RemoveEnemy(Enemy enemy)
+    {
+        enemies.Remove(enemy);
     }
 }

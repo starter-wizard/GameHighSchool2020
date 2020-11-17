@@ -57,7 +57,8 @@ public class Gun : MonoBehaviour {
             //(정담...) 탄창에 총알이 있다면
             if(magAmmo > 0)
             {
-                Shot();
+                if(state == State.Ready)
+                    Shot();
 
                 //(수정...)총알을 쏠때마다 탄창의 총알은 1씩 소모
                 magAmmo -= 1;
@@ -145,18 +146,7 @@ public class Gun : MonoBehaviour {
         }
         else
         {
-            int requiredAmmo = magCapacity - magAmmo;
-
-            if (ammoRemain >= requiredAmmo)
-            {
-                magAmmo = magCapacity;
-                ammoRemain -= requiredAmmo;
-            }
-            else
-            {
-                magAmmo = ammoRemain;
-                ammoRemain = 0;
-            }
+            StartCoroutine(ReloadRoutine());
 
             return true;
         }
@@ -170,7 +160,25 @@ public class Gun : MonoBehaviour {
         // 재장전 소요 시간 만큼 처리를 쉬기
         yield return new WaitForSeconds(reloadTime);
 
+        int requiredAmmo = magCapacity - magAmmo;
+
+        if (ammoRemain >= requiredAmmo)
+        {
+            magAmmo = magCapacity;
+            ammoRemain -= requiredAmmo;
+        }
+        else
+        {
+            magAmmo = ammoRemain;
+            ammoRemain = 0;
+        }
+
         // 총의 현재 상태를 발사 준비된 상태로 변경
         state = State.Ready;
+    }
+
+    private void Update()
+    {
+        /*추가*/ UIManager.instance.UpdateAmmoText(magAmmo, ammoRemain);
     }
 }
