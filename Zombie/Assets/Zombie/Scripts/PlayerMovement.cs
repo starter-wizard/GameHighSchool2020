@@ -25,21 +25,54 @@ public class PlayerMovement : MonoBehaviour {
 
         Rotate();
 
-        playerAnimator.SetFloat("Move", playerInput.move);
+        playerAnimator.SetFloat("Move", playerInput.move + playerInput.rotate);
     }
 
     // 입력값에 따라 캐릭터를 앞뒤로 움직임
     private void Move() {
+        var forward = Camera.main.transform.forward;
+        forward.y = 0;
+        forward.Normalize();
 
-        //앞뒤 움직임
-        transform.position
-            += transform.forward
-               * moveSpeed * Time.fixedDeltaTime
-               * playerInput.move;
+        var right = Camera.main.transform.right;
+        right.y = 0;
+        right.Normalize();
+
+        //플레이어는 앞뒤로 움직인다.
+        transform.position += forward
+            * moveSpeed * Time.fixedDeltaTime
+            * playerInput.move;
+
+        //플레이어는 좌우로 움직인다.
+        transform.position += right
+            * moveSpeed * Time.fixedDeltaTime
+            * playerInput.rotate;
+
+
+
+        return;
+        //hack;
+        {
+            //앞뒤 움직임
+            transform.position
+                += transform.forward
+                   * moveSpeed * Time.fixedDeltaTime
+                   * playerInput.move;
+        }
     }
 
     // 입력값에 따라 캐릭터를 좌우로 회전
     private void Rotate() {
+
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane plane = new Plane(Vector3.up, 0);
+        float enter;
+        plane.Raycast(ray, out enter);
+        var point = ray.GetPoint(enter);
+        transform.LookAt(point);
+
+        return;
+        //hack;
         //좌 회전
         transform.Rotate(0,
             rotateSpeed * Time.fixedDeltaTime * playerInput.rotate,
